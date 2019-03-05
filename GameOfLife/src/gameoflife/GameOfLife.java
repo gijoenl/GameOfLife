@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 
 public class GameOfLife implements MouseListener, ActionListener, Runnable{
                                                                                 // VARIABLES AND OBJECTS
-    int size = 10;
+    int size = 30;
     boolean[][] cells = new boolean[size][size];
     JFrame frame = new JFrame("Nicolas's Game Of Life");
     GameOfLifeController controller = new GameOfLifeController(cells);
@@ -53,9 +53,10 @@ public class GameOfLife implements MouseListener, ActionListener, Runnable{
     @Override                                                                   // ABSTRACT METHODS FROM MOUSE LISTENER
     public void mouseClicked(MouseEvent event) {}
     @Override
-    public void mousePressed(MouseEvent event) {}
+    public void mousePressed(MouseEvent event) {  
+    }
     @Override
-    public void mouseReleased(MouseEvent event) {
+    public void mouseReleased(MouseEvent event) {                               // updating the frame
         //System.out.println(event.getX() + ", " + event.getY());
         double width = (double)controller.getWidth()/cells[0].length;           // converting the mouse position depending of the size of our frame
         double height = (double)controller.getHeight()/cells.length;            //
@@ -64,7 +65,7 @@ public class GameOfLife implements MouseListener, ActionListener, Runnable{
         System.out.println(column + ", " + row);
         
         cells[row][column] = !cells[row][column];                               // cheeky way to make the value to its opposite
-        frame.repaint();                                                        // updating the frame
+        frame.repaint();
     }
     @Override
     public void mouseEntered(MouseEvent event) {}
@@ -111,16 +112,16 @@ public class GameOfLife implements MouseListener, ActionListener, Runnable{
         for (int row = 0; row < cells.length; row++) {
             for (int column = 0; column < cells[0].length; column++) {
                 int neighborCount = 0;
-                if (row > 0 && column > 0 && cells[row-1][column-1] == true) { neighborCount++; }                   // UP LEFT
-                if (row > 0 && cells[row-1][column] == true) { neighborCount++; }                                   // UP 
-                if (row > 0 && column < cells[0].length-1 && cells[row-1][column+1] == true) { neighborCount++; }   // UP RIGHT
-                if (column > 0 && cells[row][column-1] == true) { neighborCount++; }                                // LEFT
-                if (column < cells[0].length-1 && cells[row][column+1] == true) { neighborCount++; }                // RIGHT
-                if (row < cells.length-1 && column > 0 && cells[row+1][column-1] == true) { neighborCount++; }      // DOWN LEFT
-                if (row < cells.length-1 && cells[row+1][column] == true) { neighborCount++; }                      // DOWN
-                if (row < cells.length-1 && column < cells[0].length-1 && cells[row+1][column+1] == true) { neighborCount++; }// DOWN RIGHT
+                if (row > 0 && column > 0 && cells[row-1][column-1] == true) { neighborCount++; }                               // UP LEFT
+                if (row > 0 && cells[row-1][column] == true) { neighborCount++; }                                               // UP 
+                if (row > 0 && column < cells[0].length-1 && cells[row-1][column+1] == true) { neighborCount++; }               // UP RIGHT
+                if (column > 0 && cells[row][column-1] == true) { neighborCount++; }                                            // LEFT
+                if (column < cells[0].length-1 && cells[row][column+1] == true) { neighborCount++; }                            // RIGHT
+                if (row < cells.length-1 && column > 0 && cells[row+1][column-1] == true) { neighborCount++; }                  // DOWN LEFT
+                if (row < cells.length-1 && cells[row+1][column] == true) { neighborCount++; }                                  // DOWN
+                if (row < cells.length-1 && column < cells[0].length-1 && cells[row+1][column+1] == true) { neighborCount++; }  // DOWN RIGHT
                 
-                if (cells[row][column] == true) {                               // I'm alive
+                if (cells[row][column] == true) {                               // If cell is alive
                     if (neighborCount == 2 || neighborCount == 3) {             
                         nextCells[row][column] = true;                          // alive next time
                     }
@@ -128,7 +129,7 @@ public class GameOfLife implements MouseListener, ActionListener, Runnable{
                         nextCells[row][column] = false;                         // dead next time
                     }
                 }
-                else {                                                          // I'm dead
+                else {                                                          // If cll is dead
                     if (neighborCount ==3 ) {
                         nextCells[row][column] = true;                          // alive next time
                     }
@@ -138,7 +139,7 @@ public class GameOfLife implements MouseListener, ActionListener, Runnable{
                 }
             }
         }
-        cells = nextCells;
+        cells = nextCells;                                                      // Updating cells data for next step()
         controller.setCells(nextCells);
         frame.repaint();
     }

@@ -45,7 +45,6 @@ public class GameOfLifeController extends JPanel {                              
    }
    
    public void setCells(boolean[][] nextCells) {
-       System.out.println("Damn, what to do ?");
+       cells = nextCells;
    }
-    
 }

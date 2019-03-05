@@ -2,7 +2,6 @@
  * This project is an implementation of the Game of Life.
  * @author Nicolas_Online
  */
-
 package gameoflife;
 
 import javax.swing.JFrame;
@@ -14,38 +13,45 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class GameOfLife implements MouseListener, ActionListener, Runnable{
                                                                                 // VARIABLES AND OBJECTS
-    int size = 30;
+    int size = 25;
+    int counter = 0;
     boolean[][] cells = new boolean[size][size];
     JFrame frame = new JFrame("Nicolas's Game Of Life");
-    GameOfLifeController controller = new GameOfLifeController(cells);
+    VuePanel vue = new VuePanel(cells);
     Container bottomContainer = new Container();
     JButton step = new JButton("Step");
     JButton start = new JButton("Start");
-    JButton stop = new JButton("Stop!");       
+    JButton stop = new JButton("Stop!");
+    private JLabel label;
     boolean running = false;
     
     public GameOfLife(){                                                        // CONSTRUCTOR
         frame.setSize(600, 600);                                                // Frame size
         frame.setLayout(new BorderLayout());                                    // Setting a border layout object
-        frame.add(controller, BorderLayout.CENTER);                             // Adding a centered panel to our frame
-        controller.addMouseListener(this);
+        frame.add(vue, BorderLayout.CENTER);                                    // Adding a centered panel to our frame
+        vue.addMouseListener(this);
         
-        bottomContainer.setLayout(new GridLayout(1, 3));                        // bottom container
+        bottomContainer.setLayout(new GridLayout(2, 3));                        // bottom container
         bottomContainer.add(step);                                              // adding each button and its listener
         step.addActionListener(this);
         bottomContainer.add(start);
         start.addActionListener(this);
         bottomContainer.add(stop);
         stop.addActionListener(this);
+        
+         label = new JLabel("Generation " + counter);
+        bottomContainer.add(label);
         frame.add(bottomContainer, BorderLayout.SOUTH);
         
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);                   // Closing the frame exits the programme
         frame.setVisible(true);                                                 // the Frame is visible
     }
+
                                                                                 // Main method
     public static void main(String[] args) {
             new GameOfLife();
@@ -58,8 +64,8 @@ public class GameOfLife implements MouseListener, ActionListener, Runnable{
     @Override
     public void mouseReleased(MouseEvent event) {                               // updating the frame
         //System.out.println(event.getX() + ", " + event.getY());
-        double width = (double)controller.getWidth()/cells[0].length;           // converting the mouse position depending of the size of our frame
-        double height = (double)controller.getHeight()/cells.length;            //
+        double width = (double)vue.getWidth()/cells[0].length;                  // converting the mouse position depending of the size of our frame
+        double height = (double)vue.getHeight()/cells.length;                   //
         int column = Math.min(cells[0].length -1, (int)(event.getX()/width));   // getting the min value to avoid clicling 1px out of the frame(out of the
         int row = Math.min(cells.length -1, (int)(event.getY()/height));        // bounds of the arrays, just in case
         System.out.println(column + ", " + row);
@@ -95,13 +101,14 @@ public class GameOfLife implements MouseListener, ActionListener, Runnable{
         while(running == true) {
             step();
             try {
-                Thread.sleep(300);                                              // slowing down the thread process
+                Thread.sleep(150);                                              // slowing down the thread process
             }   
             catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
     }
+    
     /*
     *   row-1, column-1     row-1, column       row-1, column+1
     *   row, column-1       row, column         row, column+1
@@ -112,6 +119,7 @@ public class GameOfLife implements MouseListener, ActionListener, Runnable{
         for (int row = 0; row < cells.length; row++) {
             for (int column = 0; column < cells[0].length; column++) {
                 int neighborCount = 0;
+                
                 if (row > 0 && column > 0 && cells[row-1][column-1] == true) { neighborCount++; }                               // UP LEFT
                 if (row > 0 && cells[row-1][column] == true) { neighborCount++; }                                               // UP 
                 if (row > 0 && column < cells[0].length-1 && cells[row-1][column+1] == true) { neighborCount++; }               // UP RIGHT
@@ -140,7 +148,9 @@ public class GameOfLife implements MouseListener, ActionListener, Runnable{
             }
         }
         cells = nextCells;                                                      // Updating cells data for next step()
-        controller.setCells(nextCells);
+        vue.setCells(nextCells);
+        counter++;
+        label.setText("Generation : "+Integer.toString(counter));
         frame.repaint();
     }
 

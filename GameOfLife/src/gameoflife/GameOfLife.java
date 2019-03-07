@@ -12,13 +12,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class GameOfLife implements MouseListener, ActionListener, Runnable{
                                                                                 // VARIABLES AND OBJECTS
-    int size = 25;
+    int size = 10;
     int counter = 0;
     boolean[][] cells = new boolean[size][size];
     JFrame frame = new JFrame("Nicolas's Game Of Life");
@@ -34,9 +38,10 @@ public class GameOfLife implements MouseListener, ActionListener, Runnable{
         frame.setSize(600, 600);                                                // Frame size
         frame.setLayout(new BorderLayout());                                    // Setting a border layout object
         frame.add(vue, BorderLayout.CENTER);                                    // Adding a centered panel to our frame
+        
         vue.addMouseListener(this);
         
-        bottomContainer.setLayout(new GridLayout(2, 3));                        // bottom container
+        bottomContainer.setLayout(new GridLayout(1, 4));                        // bottom container
         bottomContainer.add(step);                                              // adding each button and its listener
         step.addActionListener(this);
         bottomContainer.add(start);
@@ -51,16 +56,15 @@ public class GameOfLife implements MouseListener, ActionListener, Runnable{
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);                   // Closing the frame exits the programme
         frame.setVisible(true);                                                 // the Frame is visible
     }
-
-                                                                                // Main method
+                                                                            // Main method
     public static void main(String[] args) {
             new GameOfLife();
         }
+    
     @Override                                                                   // ABSTRACT METHODS FROM MOUSE LISTENER
     public void mouseClicked(MouseEvent event) {}
     @Override
-    public void mousePressed(MouseEvent event) {  
-    }
+    public void mousePressed(MouseEvent event) {}
     @Override
     public void mouseReleased(MouseEvent event) {                               // updating the frame
         //System.out.println(event.getX() + ", " + event.getY());
@@ -68,7 +72,7 @@ public class GameOfLife implements MouseListener, ActionListener, Runnable{
         double height = (double)vue.getHeight()/cells.length;                   //
         int column = Math.min(cells[0].length -1, (int)(event.getX()/width));   // getting the min value to avoid clicling 1px out of the frame(out of the
         int row = Math.min(cells.length -1, (int)(event.getY()/height));        // bounds of the arrays, just in case
-        System.out.println(column + ", " + row);
+        //System.out.println(column + ", " + row);
         
         cells[row][column] = !cells[row][column];                               // cheeky way to make the value to its opposite
         frame.repaint();
@@ -93,9 +97,36 @@ public class GameOfLife implements MouseListener, ActionListener, Runnable{
         }
         if(event.getSource().equals(stop)) {
             System.out.println("Stop");
+            try {              
+                   fileWriter(toString());      
+            } 
+            catch (Exception ex) {
+                Logger.getLogger(GameOfLife.class.getName()).log(Level.SEVERE, null, ex);
+            }
             running = false;
         }
     }
+    
+    public void fileWriter(String something) throws Exception{
+        BufferedWriter writer = new BufferedWriter(new FileWriter("log.txt"));
+        writer.write(something);
+        writer.close();
+    }
+    
+    public String toString(){
+         boolean[][] nextCells = new boolean[cells.length][cells[0].length];
+        String str = "";
+        for(int row = 0; row < cells.length; row++){
+            str += "|";
+            for(int column = 0; column < cells[0].length; column++) {
+                if (cells[row][column]) {str += "X|";}
+                else {str += "O|";}
+            }
+            str += "\r\n";
+        }
+        return str;
+    }
+    
     @Override                                                                   // ABSTRACT METHOD FROM RUNNABLE
     public void run() {
         while(running == true) {
@@ -119,7 +150,7 @@ public class GameOfLife implements MouseListener, ActionListener, Runnable{
         for (int row = 0; row < cells.length; row++) {
             for (int column = 0; column < cells[0].length; column++) {
                 int neighborCount = 0;
-                
+                var save = cells[row][column];
                 if (row > 0 && column > 0 && cells[row-1][column-1] == true) { neighborCount++; }                               // UP LEFT
                 if (row > 0 && cells[row-1][column] == true) { neighborCount++; }                                               // UP 
                 if (row > 0 && column < cells[0].length-1 && cells[row-1][column+1] == true) { neighborCount++; }               // UP RIGHT
@@ -128,7 +159,7 @@ public class GameOfLife implements MouseListener, ActionListener, Runnable{
                 if (row < cells.length-1 && column > 0 && cells[row+1][column-1] == true) { neighborCount++; }                  // DOWN LEFT
                 if (row < cells.length-1 && cells[row+1][column] == true) { neighborCount++; }                                  // DOWN
                 if (row < cells.length-1 && column < cells[0].length-1 && cells[row+1][column+1] == true) { neighborCount++; }  // DOWN RIGHT
-                
+
                 if (cells[row][column] == true) {                               // If cell is alive
                     if (neighborCount == 2 || neighborCount == 3) {             
                         nextCells[row][column] = true;                          // alive next time
@@ -152,7 +183,5 @@ public class GameOfLife implements MouseListener, ActionListener, Runnable{
         counter++;
         label.setText("Generation : "+Integer.toString(counter));
         frame.repaint();
-    }
-
-    
+    } 
 }

@@ -14,7 +14,7 @@ public class VuePanel extends JPanel {
     double width;
     double height;
     
-    public VuePanel(boolean[][] in) {                               // now the cells of the Main method and these are pointing on the same thing
+    public VuePanel(boolean[][] in) {                                           // now the cells of the Main method and these are pointing on the same thing
         cells = in;
     }
     
